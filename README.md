@@ -1,5 +1,10 @@
 # SP Filter Extension - README
 
+## Example  
+Below is an example of how the extension looks when opened:  
+
+![Example](example.png)  
+
 ## Overview  
 The **SP Filter Extension** allows users to automatically hide item cards based on their sticker percentage (**SP**) value. It removes any `<item-card>` elements that:
 
@@ -33,13 +38,6 @@ The **SP Filter Extension** allows users to automatically hide item cards based 
 
 ### Disable Filtering  
 - Toggle **"Enable Filtering"** to **OFF** to restore all hidden items.  
-
----
-
-## Example  
-Below is an example of how the extension looks when opened:  
-
-![Example](example.png)  
 
 ---
 
