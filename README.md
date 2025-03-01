@@ -27,3 +27,5 @@ Notes
 The filter automatically updates when new items load on the page.
 Reload the extension after making changes in chrome://extensions/ if needed.
 This tool ensures you only see items within your preferred sticker price range. 🚀
+
+![Example](example.png)
