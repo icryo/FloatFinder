@@ -1,0 +1,31 @@
+{
+  "name": "SP Filter Extension",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Removes item-cards above a certain SP threshold.",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  /* (Icons are optional, but recommended) */
+  
+  "permissions": [
+    "storage",   // For saving toggle/slider settings
+    "activeTab", // Needed if we want to inject scripts on a user-click
+    "scripting"  // For programmatic content script injection in MV3
+  ],
+
+  // The default action creates the extension's toolbar button & popup
+  "action": {
+    "default_popup": "popup.html"
+  },
+
+  // This content script runs on *all* URLs. Restrict if you want (e.g. "*://example.com/*")
+  "content_scripts": [
+    {
+      "matches": ["*://csfloat.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ]
+}
