@@ -7,7 +7,7 @@
     body {
       margin: 10px;
       font-family: sans-serif;
-      min-width: 200px;
+      min-width: 250px;
     }
     label {
       display: flex;
@@ -18,22 +18,45 @@
 </head>
 <body>
   <h3>SP Filter Extension</h3>
+
   <label>
-    <input type="checkbox" id="toggleFilter" />
-    Enable Filtering
+    <input type="checkbox" id="toggleStickerFilter" />
+    Enable Sticker Filtering
   </label>
+
   <div style="margin-top: 10px;">
     <label>
-      Threshold: 
-      <span id="thresholdValue">19</span>%
+      SP Threshold: 
+      <span id="stickerThresholdValue">19</span>%
     </label>
     <input type="range"
-           id="thresholdSlider"
+           id="stickerThresholdSlider"
            min="0"
            max="200"
            step="1"
            value="19" />
   </div>
+
+  <hr>
+
+  <label>
+    <input type="checkbox" id="toggleFadeFilter" />
+    Enable Fade Filtering
+  </label>
+
+  <div style="margin-top: 10px;">
+    <label>
+      Fade Threshold:
+      <span id="fadeThresholdValue">90</span>%
+    </label>
+    <input type="range"
+           id="fadeThresholdSlider"
+           min="0"
+           max="100"
+           step="0.1"
+           value="90" />
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>

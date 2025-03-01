@@ -1,35 +1,42 @@
-let spFilterEnabled = false;
-let spThreshold = 19;
+let stickerFilterEnabled = false;
+let stickerThreshold = 19;
+let fadeFilterEnabled = false;
+let fadeThreshold = 90;
 
-const observer = new MutationObserver((mutationsList, observer) => {
-  if (!spFilterEnabled) return;
-  applyFilter();
+const observer = new MutationObserver(() => {
+  if (stickerFilterEnabled || fadeFilterEnabled) {
+    applyFilter();
+  }
 });
 observer.observe(document.body, { childList: true, subtree: true });
 
 initFromStorage();
 
 async function initFromStorage() {
-  const { spFilterEnabled: enabled, spThreshold: threshold } = await chrome.storage.local.get({
-    spFilterEnabled: false,
-    spThreshold: 19
+  const { stickerFilterEnabled: stickerEnabled, stickerThreshold: stickerT, fadeFilterEnabled: fadeEnabled, fadeThreshold: fadeT } = await chrome.storage.local.get({
+    stickerFilterEnabled: false,
+    stickerThreshold: 19,
+    fadeFilterEnabled: false,
+    fadeThreshold: 90
   });
-  spFilterEnabled = enabled;
-  spThreshold = threshold;
-  if (spFilterEnabled) applyFilter();
+  stickerFilterEnabled = stickerEnabled;
+  stickerThreshold = stickerT;
+  fadeFilterEnabled = fadeEnabled;
+  fadeThreshold = fadeT;
+  applyFilter();
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.spFilterEnabled !== undefined) {
-    spFilterEnabled = message.spFilterEnabled;
-    spThreshold = message.spThreshold;
-    if (spFilterEnabled) {
-      applyFilter();
-    } else {
-      removeFilter();
-    }
-    sendResponse({ status: 'ok' });
+  if (message.stickerFilterEnabled !== undefined) {
+    stickerFilterEnabled = message.stickerFilterEnabled;
+    stickerThreshold = message.stickerThreshold;
   }
+  if (message.fadeFilterEnabled !== undefined) {
+    fadeFilterEnabled = message.fadeFilterEnabled;
+    fadeThreshold = message.fadeThreshold;
+  }
+  applyFilter();
+  sendResponse({ status: 'ok' });
 });
 
 function applyFilter() {
@@ -51,36 +58,43 @@ function removeFilter() {
 }
 
 /**
- * Returns true if the card should be hidden.
+ * Determines whether a card should be hidden.
  *
- * Conditions:
- * 1. If a card has a .sticker-percentage element:
- *    a. If its text does not contain "%SP" (case-insensitive), hide the card.
- *    b. If its text starts with ">", hide the card.
- *    c. If its text matches the pattern "X% SP" and X is greater than or equal to the threshold, hide the card.
- * 2. If no .sticker-percentage element exists, hide the card.
+ * Sticker Filtering:
+ * - Removes cards missing a valid "% SP" sticker.
+ * - Removes cards with a sticker greater than or equal to the set threshold.
+ * - Removes cards with ">100% SP".
+ *
+ * Fade Filtering:
+ * - Removes cards with a fade percentage **below** the set threshold.
  */
 function shouldHide(card) {
-  const stickerElem = card.querySelector('.sticker-percentage');
-  if (stickerElem) {
-    const txt = stickerElem.textContent.trim();
-    // Remove if text does not contain "%SP"
-    if (!/%\s*SP/i.test(txt)) {
-      return true;
+  let hideCard = false;
+
+  if (stickerFilterEnabled) {
+    const stickerElem = card.querySelector('.sticker-percentage');
+    if (stickerElem) {
+      const txt = stickerElem.textContent.trim();
+      if (!/%\s*SP/i.test(txt)) return true;
+      if (txt.startsWith('>')) return true;
+
+      const match = txt.match(/^(\d+(\.\d+)?)%\s*SP$/i);
+      if (match) {
+        const value = parseFloat(match[1]);
+        if (value >= stickerThreshold) hideCard = true;
+      }
+    } else {
+      hideCard = true;
     }
-    // Remove if text starts with ">"
-    if (txt.startsWith('>')) {
-      return true;
-    }
-    // Match the "X% SP" pattern and compare numeric value
-    const match = txt.match(/^(\d+(\.\d+)?)%\s*SP$/i);
-    if (match) {
-      const value = parseFloat(match[1]);
-      return value >= spThreshold;
-    }
-    // If sticker text exists but does not match the valid pattern, remove the card.
-    return true;
   }
-  // Hide the card if there is no sticker-percentage element.
-  return true;
+
+  if (fadeFilterEnabled) {
+    const fadeElem = card.querySelector('.fade');
+    if (fadeElem) {
+      const fadeValue = parseFloat(fadeElem.textContent.trim());
+      if (!isNaN(fadeValue) && fadeValue < fadeThreshold) hideCard = true;
+    }
+  }
+
+  return hideCard;
 }
