@@ -1,62 +1,79 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  const stickerToggleEl = document.getElementById('toggleStickerFilter');
-  const stickerSliderEl = document.getElementById('stickerThresholdSlider');
-  const stickerThresholdValEl = document.getElementById('stickerThresholdValue');
+  const settings = [
+    { id: 'toggleStickerFilter', key: 'stickerFilterEnabled' },
+    { id: 'toggleFadeFilter', key: 'fadeFilterEnabled' },
+    { id: 'toggleWatchFilter', key: 'watchFilterEnabled' },
+    { id: 'toggleAppraisalFilter', key: 'appraisalFilterEnabled' }
+  ];
 
-  const fadeToggleEl = document.getElementById('toggleFadeFilter');
-  const fadeSliderEl = document.getElementById('fadeThresholdSlider');
-  const fadeThresholdValEl = document.getElementById('fadeThresholdValue');
+  const sliders = [
+    { id: 'stickerThresholdSlider', key: 'stickerThreshold', displayId: 'stickerThresholdValue', default: 19 },
+    { id: 'fadeThresholdSlider', key: 'fadeThreshold', displayId: 'fadeThresholdValue', default: 90 },
+    { id: 'watchThresholdSlider', key: 'watchThreshold', displayId: 'watchThresholdValue', default: 10 },
+    { id: 'appraisalThresholdSlider', key: 'appraisalThreshold', displayId: 'appraisalThresholdValue', default: 100 }
+  ];
 
-  let { stickerFilterEnabled, stickerThreshold, fadeFilterEnabled, fadeThreshold } = await chrome.storage.local.get({
+  // Load initial values from storage with defaults
+  const storedValues = await chrome.storage.local.get({
     stickerFilterEnabled: false,
     stickerThreshold: 19,
     fadeFilterEnabled: false,
-    fadeThreshold: 90
+    fadeThreshold: 90,
+    watchFilterEnabled: false,
+    watchThreshold: 10,
+    appraisalFilterEnabled: false,
+    appraisalThreshold: 100
   });
 
-  stickerToggleEl.checked = stickerFilterEnabled;
-  stickerSliderEl.value = stickerThreshold;
-  stickerThresholdValEl.textContent = stickerThreshold;
-
-  fadeToggleEl.checked = fadeFilterEnabled;
-  fadeSliderEl.value = fadeThreshold;
-  fadeThresholdValEl.textContent = fadeThreshold;
-
-  stickerToggleEl.addEventListener('change', async () => {
-    stickerFilterEnabled = stickerToggleEl.checked;
-    await chrome.storage.local.set({ stickerFilterEnabled });
-    notifyContentScript();
+  // Initialize toggles
+  settings.forEach(({ id, key }) => {
+    const element = document.getElementById(id);
+    element.checked = storedValues[key];
+    element.addEventListener('change', async () => {
+      await chrome.storage.local.set({ [key]: element.checked });
+      notifyContentScript();
+    });
   });
 
-  stickerSliderEl.addEventListener('input', async () => {
-    stickerThreshold = parseFloat(stickerSliderEl.value);
-    stickerThresholdValEl.textContent = stickerThreshold;
-    await chrome.storage.local.set({ stickerThreshold });
-    notifyContentScript();
+  // Initialize sliders
+  sliders.forEach(({ id, key, displayId, default: defaultValue }) => {
+    const slider = document.getElementById(id);
+    const display = document.getElementById(displayId);
+    slider.value = storedValues[key] ?? defaultValue;
+    display.textContent = slider.value;
+
+    slider.addEventListener('input', async () => {
+      display.textContent = slider.value;
+      await chrome.storage.local.set({ [key]: parseFloat(slider.value) });
+      notifyContentScript();
+    });
   });
 
-  fadeToggleEl.addEventListener('change', async () => {
-    fadeFilterEnabled = fadeToggleEl.checked;
-    await chrome.storage.local.set({ fadeFilterEnabled });
-    notifyContentScript();
-  });
+  // Updated notify function to fetch the latest settings before messaging the content script
+  async function notifyContentScript() {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tabs.length) return;
 
-  fadeSliderEl.addEventListener('input', async () => {
-    fadeThreshold = parseFloat(fadeSliderEl.value);
-    fadeThresholdValEl.textContent = fadeThreshold;
-    await chrome.storage.local.set({ fadeThreshold });
-    notifyContentScript();
-  });
+    const updatedValues = await chrome.storage.local.get({
+      stickerFilterEnabled: false,
+      stickerThreshold: 19,
+      fadeFilterEnabled: false,
+      fadeThreshold: 90,
+      watchFilterEnabled: false,
+      watchThreshold: 10,
+      appraisalFilterEnabled: false,
+      appraisalThreshold: 100
+    });
 
-  function notifyContentScript() {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      if (!tabs.length) return;
-      chrome.tabs.sendMessage(tabs[0].id, {
-        stickerFilterEnabled,
-        stickerThreshold,
-        fadeFilterEnabled,
-        fadeThreshold
-      });
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      files: ["contentScript.js"]
+    }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn("Content script not injected:", chrome.runtime.lastError);
+        return;
+      }
+      chrome.tabs.sendMessage(tabs[0].id, updatedValues);
     });
   }
 });

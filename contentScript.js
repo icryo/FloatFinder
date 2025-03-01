@@ -1,100 +1,129 @@
-let stickerFilterEnabled = false;
-let stickerThreshold = 19;
-let fadeFilterEnabled = false;
-let fadeThreshold = 90;
+let settings = {
+  stickerFilterEnabled: false,
+  stickerThreshold: 19,
+  fadeFilterEnabled: false,
+  fadeThreshold: 90,
+  watchFilterEnabled: false,
+  watchThreshold: 10,
+  appraisalFilterEnabled: false,
+  appraisalThreshold: 100
+};
+
+async function loadSettings() {
+  try {
+    const storedValues = await chrome.storage.local.get(settings);
+    Object.assign(settings, storedValues);
+    console.log("[SP Filter] Loaded settings:", settings);
+    applyFilter();
+  } catch (error) {
+    console.error("[SP Filter] Error loading settings:", error);
+  }
+}
 
 const observer = new MutationObserver(() => {
-  if (stickerFilterEnabled || fadeFilterEnabled) {
+  try {
     applyFilter();
+  } catch (error) {
+    console.error("[SP Filter] Error in MutationObserver:", error);
   }
 });
 observer.observe(document.body, { childList: true, subtree: true });
 
-initFromStorage();
-
-async function initFromStorage() {
-  const { stickerFilterEnabled: stickerEnabled, stickerThreshold: stickerT, fadeFilterEnabled: fadeEnabled, fadeThreshold: fadeT } = await chrome.storage.local.get({
-    stickerFilterEnabled: false,
-    stickerThreshold: 19,
-    fadeFilterEnabled: false,
-    fadeThreshold: 90
-  });
-  stickerFilterEnabled = stickerEnabled;
-  stickerThreshold = stickerT;
-  fadeFilterEnabled = fadeEnabled;
-  fadeThreshold = fadeT;
-  applyFilter();
-}
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.stickerFilterEnabled !== undefined) {
-    stickerFilterEnabled = message.stickerFilterEnabled;
-    stickerThreshold = message.stickerThreshold;
+  try {
+    console.log("[SP Filter] Received new settings:", message);
+    Object.assign(settings, message);
+    applyFilter();
+    sendResponse({ status: 'ok' });
+  } catch (error) {
+    console.error("[SP Filter] Error handling message:", error);
   }
-  if (message.fadeFilterEnabled !== undefined) {
-    fadeFilterEnabled = message.fadeFilterEnabled;
-    fadeThreshold = message.fadeThreshold;
-  }
-  applyFilter();
-  sendResponse({ status: 'ok' });
 });
 
+async function init() {
+  await loadSettings();
+  applyFilter();
+}
+
+// Ensure initialization runs even if DOMContentLoaded has already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
 function applyFilter() {
-  const cards = document.querySelectorAll('item-card');
-  cards.forEach(card => {
-    if (shouldHide(card)) {
-      card.style.display = 'none';
-    } else {
-      card.style.display = '';
-    }
-  });
-}
-
-function removeFilter() {
-  const cards = document.querySelectorAll('item-card');
-  cards.forEach(card => {
-    card.style.display = '';
-  });
-}
-
-/**
- * Determines whether a card should be hidden.
- *
- * Sticker Filtering:
- * - Removes cards missing a valid "% SP" sticker.
- * - Removes cards with a sticker greater than or equal to the set threshold.
- * - Removes cards with ">100% SP".
- *
- * Fade Filtering:
- * - Removes cards with a fade percentage **below** the set threshold.
- */
-function shouldHide(card) {
-  let hideCard = false;
-
-  if (stickerFilterEnabled) {
-    const stickerElem = card.querySelector('.sticker-percentage');
-    if (stickerElem) {
-      const txt = stickerElem.textContent.trim();
-      if (!/%\s*SP/i.test(txt)) return true;
-      if (txt.startsWith('>')) return true;
-
-      const match = txt.match(/^(\d+(\.\d+)?)%\s*SP$/i);
-      if (match) {
-        const value = parseFloat(match[1]);
-        if (value >= stickerThreshold) hideCard = true;
+  try {
+    document.querySelectorAll('item-card').forEach((card) => {
+      if (shouldHide(card)) {
+        card.style.display = 'none';
+      } else {
+        card.style.display = '';
       }
-    } else {
-      hideCard = true;
-    }
+    });
+  } catch (error) {
+    console.error("[SP Filter] Error applying filter:", error);
   }
+}
 
-  if (fadeFilterEnabled) {
+function shouldHide(card) {
+  return (
+    (settings.stickerFilterEnabled && checkSticker(card)) ||
+    (settings.fadeFilterEnabled && checkFade(card)) ||
+    (settings.watchFilterEnabled && checkWatchCount(card)) ||
+    (settings.appraisalFilterEnabled && checkAppraisal(card))
+  );
+}
+
+function checkSticker(card) {
+  try {
+    const stickerElem = card.querySelector('.sticker-percentage');
+    if (!stickerElem) return false;
+    // Updated regex to allow an optional ">" at the start
+    const match = stickerElem.textContent.trim().match(/>?(\d+(\.\d+)?)%\s*SP/i);
+    return match ? parseFloat(match[1]) >= settings.stickerThreshold : false;
+  } catch (error) {
+    console.error("[SP Filter] Error checking sticker percentage:", error);
+    return false;
+  }
+}
+
+function checkFade(card) {
+  try {
     const fadeElem = card.querySelector('.fade');
-    if (fadeElem) {
-      const fadeValue = parseFloat(fadeElem.textContent.trim());
-      if (!isNaN(fadeValue) && fadeValue < fadeThreshold) hideCard = true;
-    }
+    if (!fadeElem) return false;
+    const match = fadeElem.textContent.trim().match(/^(\d+(\.\d+)?)$/);
+    return match ? parseFloat(match[1]) < settings.fadeThreshold : false;
+  } catch (error) {
+    console.error("[SP Filter] Error checking fade percentage:", error);
+    return false;
   }
+}
 
-  return hideCard;
+function checkWatchCount(card) {
+  try {
+    const watchElem = card.querySelector('.count');
+    if (!watchElem) return false;
+    const watchText = watchElem.textContent.replace(/[^\d]/g, '').trim();
+    if (!watchText) return false;
+    const watchValue = parseInt(watchText, 10);
+    return watchValue < settings.watchThreshold;
+  } catch (error) {
+    console.error("[SP Filter] Error checking watch count:", error);
+    return false;
+  }
+}
+
+function checkAppraisal(card) {
+  try {
+    const appraisalElem = card.querySelector('.reference .percentage');
+    if (!appraisalElem) return false;
+    const appraisalText = appraisalElem.textContent.replace(/[^\d.]/g, '').trim();
+    if (!appraisalText) return false;
+    const appraisalValue = parseFloat(appraisalText);
+    return appraisalValue < settings.appraisalThreshold;
+  } catch (error) {
+    console.error("[SP Filter] Error checking appraisal price:", error);
+    return false;
+  }
 }

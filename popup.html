@@ -57,6 +57,46 @@
            value="90" />
   </div>
 
+  <hr>
+
+  <label>
+    <input type="checkbox" id="toggleWatchFilter" />
+    Enable Watch Count Filtering
+  </label>
+
+  <div style="margin-top: 10px;">
+    <label>
+      Minimum Watch Count:
+      <span id="watchThresholdValue">10</span>
+    </label>
+    <input type="range"
+           id="watchThresholdSlider"
+           min="0"
+           max="100"
+           step="1"
+           value="10" />
+  </div>
+
+  <hr>
+
+  <label>
+    <input type="checkbox" id="toggleAppraisalFilter" />
+    Enable Appraisal Price Filtering
+  </label>
+
+  <div style="margin-top: 10px;">
+    <label>
+      Appraisal Price Threshold:
+      <span id="appraisalThresholdValue">100</span>%
+    </label>
+    <input type="range"
+           id="appraisalThresholdSlider"
+           min="0"
+           max="200"
+           step="1"
+           value="100" />
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
