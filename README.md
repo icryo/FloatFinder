@@ -1,4 +1,4 @@
-SP Filter Extension - README
+# SP Filter Extension - README
 Overview
 The SP Filter Extension allows users to automatically hide item cards based on their sticker percentage (SP) value. It removes any <item-card> elements that:
 
