@@ -135,9 +135,11 @@ function checkAppraisal(card) {
 
 function checkPaintSeed(card) {
   try {
+    // Assuming that the paint seed is shown in an element with the class "paint-seed"
     const seedElem = card.querySelector('.paint-seed');
     if (!seedElem) return false;
     const seedValue = seedElem.textContent.trim();
+    // Split allowed seeds by whitespace or commas (e.g. "127 200 300" or "127,200,300")
     const allowedSeeds = settings.allowedPaintSeeds.split(/[\s,]+/);
     return allowedSeeds.includes(seedValue);
   } catch (error) {
