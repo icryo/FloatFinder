@@ -37,7 +37,9 @@ Open the Extension Popup
 
 Click the extension icon in your toolbar to open the popup interface.
 
-Configure Your Filters
+
+
+## Filters
 
 Sticker Filter:
 Toggle the switch to enable/disable the sticker filter. Use the slider or number input to set the SP threshold. When enabled, items with an SP equal to or above this threshold will be hidden. Items with no SP value will also be hidden.
