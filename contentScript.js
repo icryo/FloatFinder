@@ -6,7 +6,9 @@ let settings = {
   watchFilterEnabled: false,
   watchThreshold: 10,
   appraisalFilterEnabled: false,
-  appraisalThreshold: 100
+  appraisalThreshold: 100,
+  paintSeedFilterEnabled: false,
+  allowedPaintSeeds: "127"
 };
 
 async function loadSettings() {
@@ -71,7 +73,8 @@ function shouldHide(card) {
     (settings.stickerFilterEnabled && checkSticker(card)) ||
     (settings.fadeFilterEnabled && checkFade(card)) ||
     (settings.watchFilterEnabled && checkWatchCount(card)) ||
-    (settings.appraisalFilterEnabled && checkAppraisal(card))
+    (settings.appraisalFilterEnabled && checkAppraisal(card)) ||
+    (settings.paintSeedFilterEnabled && !checkPaintSeed(card))
   );
 }
 
@@ -124,6 +127,21 @@ function checkAppraisal(card) {
     return appraisalValue < settings.appraisalThreshold;
   } catch (error) {
     console.error("[SP Filter] Error checking appraisal price:", error);
+    return false;
+  }
+}
+
+function checkPaintSeed(card) {
+  try {
+    // Assuming that the paint seed is displayed in an element with the class "paint-seed"
+    const seedElem = card.querySelector('.paint-seed');
+    if (!seedElem) return false;
+    const seedValue = seedElem.textContent.trim();
+    // Split allowed seeds by whitespace or commas (e.g., "127 200 300" or "127,200,300")
+    const allowedSeeds = settings.allowedPaintSeeds.split(/[\s,]+/);
+    return allowedSeeds.includes(seedValue);
+  } catch (error) {
+    console.error("[SP Filter] Error checking paint seed:", error);
     return false;
   }
 }

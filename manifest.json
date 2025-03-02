@@ -1,19 +1,23 @@
 {
-  "name": "SP Filter Extension",
+  "name": "FloatFinder",
   "version": "1.0",
   "manifest_version": 3,
-  "description": "Removes item-cards above a certain SP threshold.",
+  "description": "Helpful filters for CSFloat",
   "icons": {
     "48": "icon48.png"
   },
+
+  
   "permissions": [
-    "storage",
+    "storage",  
     "activeTab",
-    "scripting"
+    "scripting" 
   ],
+
   "action": {
     "default_popup": "popup.html"
   },
+
   "content_scripts": [
     {
       "matches": ["*://csfloat.com/*"],
