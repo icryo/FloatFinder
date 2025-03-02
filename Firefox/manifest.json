@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "FloatFinder (Firefox)",
+  "version": "1.0",
+  "description": "Helpful filters for CSFloat",
+  "icons": {
+    "48": "icon48.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://csfloat.com/*",
+        "*://www.csfloat.com/*"
+      ],
+      "js": ["contentScript.js"]
+    }
+  ]
+}

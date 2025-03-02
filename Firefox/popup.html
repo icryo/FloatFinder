@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>FloatFinder</title>
+  <style>
+    body {
+      margin: 10px;
+      font-family: sans-serif;
+      min-width: 300px;
+      background-color: #f9f9f9;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    input[type="number"] {
+      width: 60px;
+      padding: 2px;
+    }
+    /* Toggle Switch Styles */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+    .switch input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      margin: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .sliderToggle {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 22px;
+      z-index: 1;
+    }
+    .switch input:checked + .sliderToggle {
+      background-color: #66bb6a;
+    }
+    .sliderToggle:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    .switch input:checked + .sliderToggle:before {
+      transform: translateX(18px);
+    }
+  </style>
+</head>
+<body>
+  <h3>FloatFinder</h3>
+
+  <!-- Sticker Filter Card -->
+  <div class="card">
+    <label>
+      <span class="switch">
+        <input type="checkbox" id="toggleStickerFilterSwitch" />
+        <span class="sliderToggle"></span>
+      </span>
+      Enable Sticker Filtering
+    </label>
+    <div class="slider-group">
+      <label>SP Threshold: 
+        <span id="stickerThresholdValue">19</span>%
+      </label>
+      <input type="range"
+             id="stickerThresholdSlider"
+             min="0"
+             max="200"
+             step="1"
+             value="19" />
+      <input type="number"
+             id="stickerThresholdInput"
+             min="0"
+             max="200"
+             step="1"
+             value="19" />
+    </div>
+  </div>
+
+  <!-- Fade Filter Card -->
+  <div class="card">
+    <label>
+      <span class="switch">
+        <input type="checkbox" id="toggleFadeFilterSwitch" />
+        <span class="sliderToggle"></span>
+      </span>
+      Enable Fade Filtering
+    </label>
+    <div class="slider-group">
+      <label>Fade Threshold: 
+        <span id="fadeThresholdValue">90</span>%
+      </label>
+      <input type="range"
+             id="fadeThresholdSlider"
+             min="0"
+             max="100"
+             step="0.1"
+             value="90" />
+      <input type="number"
+             id="fadeThresholdInput"
+             min="0"
+             max="100"
+             step="0.1"
+             value="90" />
+    </div>
+  </div>
+
+  <!-- Watch Count Filter Card -->
+  <div class="card">
+    <label>
+      <span class="switch">
+        <input type="checkbox" id="toggleWatchFilterSwitch" />
+        <span class="sliderToggle"></span>
+      </span>
+      Enable Watch Count Filtering
+    </label>
+    <div class="slider-group">
+      <label>Minimum Watch Count: 
+        <span id="watchThresholdValue">10</span>
+      </label>
+      <input type="range"
+             id="watchThresholdSlider"
+             min="0"
+             max="100"
+             step="1"
+             value="10" />
+      <input type="number"
+             id="watchThresholdInput"
+             min="0"
+             max="100"
+             step="1"
+             value="10" />
+    </div>
+  </div>
+
+  <!-- Appraisal Filter Card -->
+  <div class="card">
+    <label>
+      <span class="switch">
+        <input type="checkbox" id="toggleAppraisalFilterSwitch" />
+        <span class="sliderToggle"></span>
+      </span>
+      Enable Appraisal Price Filtering
+    </label>
+    <div class="slider-group">
+      <label>Appraisal Price Threshold: 
+        <span id="appraisalThresholdValue">0</span>%
+      </label>
+      <input type="range"
+             id="appraisalThresholdSlider"
+             min="0"
+             max="100"
+             step="1"
+             value="0" />
+      <input type="number"
+             id="appraisalThresholdInput"
+             min="0"
+             max="100"
+             step="1"
+             value="0" />
+    </div>
+  </div>
+
+  <!-- Paint Seed Filter Card -->
+  <div class="card">
+    <label>
+      <span class="switch">
+        <input type="checkbox" id="togglePaintSeedFilterSwitch" />
+        <span class="sliderToggle"></span>
+      </span>
+      Enable Paint Seed Filtering
+    </label>
+    <div class="slider-group">
+      <label>Allowed Paint Seeds:</label>
+      <input type="text"
+             id="paintSeedListInput"
+             placeholder="e.g. 127 200 300"
+             value="127" />
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
