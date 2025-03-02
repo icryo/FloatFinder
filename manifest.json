@@ -4,21 +4,16 @@
   "manifest_version": 3,
   "description": "Removes item-cards above a certain SP threshold.",
   "icons": {
-    "48": "icon48.png",
+    "48": "icon48.png"
   },
-
-  
   "permissions": [
-    "storage",   
+    "storage",
     "activeTab",
-    "scripting"  
+    "scripting"
   ],
-
-
   "action": {
     "default_popup": "popup.html"
   },
-
   "content_scripts": [
     {
       "matches": ["*://csfloat.com/*"],
