@@ -1,4 +1,3 @@
-Create an Extension Folder:
 Place all the files (manifest.json, popup.html, popup.js, contentScript.js, icon48.png, etc.) in a single folder.
 
 Open Firefox:
