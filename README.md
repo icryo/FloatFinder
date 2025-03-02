@@ -1,6 +1,5 @@
-# SP Filter Extension
+# FloatFinder
 
-The **SP Filter Extension** is a Chrome extension that automatically hides item cards on supported websites based on a set of configurable filters. It was originally designed for filtering in-game skins (e.g., in CS:GO) but can be adapted to any situation where you need to filter items based on various criteria.
 
 ![Example](example.png)
 
