@@ -81,13 +81,15 @@ function shouldHide(card) {
 function checkSticker(card) {
   try {
     const stickerElem = card.querySelector('.sticker-percentage');
-    if (!stickerElem) return false;
-    // Updated regex to allow an optional ">" at the start
+    // If there's no SP element, remove the card when the toggle is on.
+    if (!stickerElem) return true;
     const match = stickerElem.textContent.trim().match(/>?(\d+(\.\d+)?)%\s*SP/i);
-    return match ? parseFloat(match[1]) >= settings.stickerThreshold : false;
+    // If the text doesn't match, treat it as missing and remove the card.
+    if (!match) return true;
+    return parseFloat(match[1]) >= settings.stickerThreshold;
   } catch (error) {
     console.error("[SP Filter] Error checking sticker percentage:", error);
-    return false;
+    return true;
   }
 }
 
@@ -133,11 +135,9 @@ function checkAppraisal(card) {
 
 function checkPaintSeed(card) {
   try {
-    // Assuming that the paint seed is displayed in an element with the class "paint-seed"
     const seedElem = card.querySelector('.paint-seed');
     if (!seedElem) return false;
     const seedValue = seedElem.textContent.trim();
-    // Split allowed seeds by whitespace or commas (e.g., "127 200 300" or "127,200,300")
     const allowedSeeds = settings.allowedPaintSeeds.split(/[\s,]+/);
     return allowedSeeds.includes(seedValue);
   } catch (error) {
