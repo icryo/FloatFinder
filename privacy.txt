@@ -1,0 +1,1 @@
+This plugin does not collect, store, or transmit any personal or browsing data. All settings and preferences you set (such as filter thresholds, toggle states, and paint seed lists) are stored locally on your device using Chrome's local storage.
