@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     { checkboxId: 'toggleStickerFilterSwitch', key: 'stickerFilterEnabled' },
     { checkboxId: 'toggleFadeFilterSwitch', key: 'fadeFilterEnabled' },
     { checkboxId: 'toggleWatchFilterSwitch', key: 'watchFilterEnabled' },
-    { checkboxId: 'toggleAppraisalFilterSwitch', key: 'appraisalFilterEnabled' }
+    { checkboxId: 'toggleAppraisalFilterSwitch', key: 'appraisalFilterEnabled' },
+    { checkboxId: 'toggleAppraisalDiscountedOnly', key: 'appraisalDiscountedOnly' }
   ];
 
   // Existing slider definitions for other filters...
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     watchThreshold: 10,
     appraisalFilterEnabled: false,
     appraisalThreshold: 0,
+    appraisalDiscountedOnly: false,
     paintSeedFilterEnabled: false,
     allowedPaintSeeds: "127"
   });
@@ -93,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       watchThreshold: 10,
       appraisalFilterEnabled: false,
       appraisalThreshold: 0,
+      appraisalDiscountedOnly: false,
       paintSeedFilterEnabled: false,
       allowedPaintSeeds: "127"
     });

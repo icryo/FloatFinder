@@ -9,6 +9,7 @@ let settings = {
   watchThreshold: 10,
   appraisalFilterEnabled: false,
   appraisalThreshold: 0,
+  appraisalDiscountedOnly: false,
   paintSeedFilterEnabled: false,
   allowedPaintSeeds: "127"
 };
@@ -95,6 +96,14 @@ function checkAppraisal(card) {
     if (!appraisalElem) return false;
     const match = appraisalElem.textContent.trim().match(/-?\d+(\.\d+)?/);
     if (!match) return false;
+
+    // We determine if the item is discounted by the color of the appraisal circle
+    let circles = card.querySelectorAll('.reference svg.ng-star-inserted circle');
+    if (circles) {
+      if (circles.length !== 1) return false; // If this is not 1, the search has probably failed
+      if (circles[0].getAttribute('fill') !== '#64EC42' && settings.appraisalDiscountedOnly) return true;
+    }
+    
     const appraisalValue = parseFloat(match[0]);
     return appraisalValue < settings.appraisalThreshold;
   } catch (error) {
