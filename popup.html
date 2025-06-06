@@ -78,6 +78,13 @@
       transition: .4s;
       border-radius: 50%;
     }
+    .default-checkbox {
+      appearance: auto;
+      position: static;
+      opacity: 1;
+      width: auto;
+      height: auto;
+    }
   </style>
 </head>
 <body>
@@ -193,6 +200,10 @@
            step="1"
            value="0" />
   </div>
+  <label>
+    <input type="checkbox" class="default-checkbox" id="toggleAppraisalDiscountedOnly" />
+    Only display items below the appraisal price
+  </label>
 </div>
 
 
